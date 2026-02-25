@@ -1,0 +1,15 @@
+.products-page{
+  padding:50px 0;
+}
+
+.title{
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:30px;
+}
+
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:24px;
+}

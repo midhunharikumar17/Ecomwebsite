@@ -1,0 +1,54 @@
+.details-container{
+  display:flex;
+  gap:60px;
+  padding:60px 10%;
+}
+
+.details-left img{
+  width:400px;
+  border-radius:12px;
+}
+
+.details-right{
+  flex:1;
+}
+
+.details-right h2{
+  font-size:32px;
+  margin-bottom:20px;
+}
+
+.price{
+  font-size:24px;
+  font-weight:600;
+  color:var(--primary);
+  margin-bottom:20px;
+}
+
+.description{
+  color:#555;
+  line-height:1.6;
+  margin-bottom:30px;
+}
+
+.details-buttons{
+  display:flex;
+  gap:20px;
+}
+
+.cart-btn{
+  background:var(--primary);
+  color:white;
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.wishlist-btn{
+  background:#f5f5f5;
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}

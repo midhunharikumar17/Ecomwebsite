@@ -1,0 +1,23 @@
+:root {
+
+  /* BRAND COLORS */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent: #f59e0b;
+
+  /* TEXT */
+  --text-dark: #111827;
+  --text-light: #6b7280;
+
+  /* BACKGROUND */
+  --bg-main: #f5f7fb;
+  --bg-card: #ffffff;
+  --border: #e5e7eb;
+
+  /* SHADOW */
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 20px rgba(0,0,0,0.08);
+
+  /* RADIUS */
+  --radius: 12px;
+}

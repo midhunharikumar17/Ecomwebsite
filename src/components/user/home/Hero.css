@@ -1,0 +1,23 @@
+.hero{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:40px;
+  margin-top:30px;
+}
+
+.hero-left h1{
+  font-size:42px;
+  margin-bottom:15px;
+}
+
+.hero-left p{
+  color:var(--muted);
+  margin-bottom:25px;
+  line-height:1.6;
+}
+
+.hero-right img{
+  width:100%;
+  border-radius:20px;
+}

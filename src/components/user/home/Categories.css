@@ -1,0 +1,39 @@
+.categories-section{
+  margin-top:40px;
+}
+
+.categories-section h2{
+  margin-bottom:20px;
+  font-size:24px;
+}
+
+.categories{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+.category-card{
+  min-width:140px;
+  background:white;
+  padding:18px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.category-card:hover{
+  transform:translateY(-5px);
+}
+
+.category-card img{
+  width:60px;
+  margin-bottom:10px;
+}
+
+.category-card p{
+  font-weight:600;
+}

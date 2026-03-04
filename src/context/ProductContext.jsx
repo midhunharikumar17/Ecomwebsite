@@ -1,56 +1,27 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import axios from "axios";
 
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
+  const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [products] = useState([
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: 2499,
-      image: "https://picsum.photos/400?1",
-      description: "Noise cancellation headphones with premium sound quality."
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: 3999,
-      image: "https://picsum.photos/400?2",
-      description: "Track fitness, heart rate and notifications."
-    },
-    {
-      id: 3,
-      name: "Gaming Mouse",
-      price: 1499,
-      image: "https://picsum.photos/400?3",
-      description: "High precision gaming mouse with RGB lighting."
-    },
-    {
-      id: 4,
-      name: "Bluetooth Speaker",
-      price: 1999,
-      image: "https://picsum.photos/400?4",
-      description: "Portable speaker with deep bass and long battery."
-    },
-    {
-      id: 5,
-      name: "Mechanical Keyboard",
-      price: 4599,
-      image: "https://picsum.photos/400?5",
-      description: "Mechanical keyboard with tactile feedback."
-    },
-    {
-      id: 6,
-      name: "Laptop Stand",
-      price: 899,
-      image: "https://picsum.photos/400?6",
-      description: "Ergonomic aluminum laptop stand."
-    },
-  ]);
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/products")
+      .then(res => setProducts(res.data))
+      .catch(err => console.log("API Error:", err));
+  }, []);
+
+    // Filtered products
+  const filteredProducts = useMemo(() => {
+    return products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [products, searchTerm]);
 
   return (
-    <ProductContext.Provider value={{ products }}>
+    <ProductContext.Provider value={{ products, filteredProducts, searchTerm, setSearchTerm}}>
       {children}
     </ProductContext.Provider>
   );

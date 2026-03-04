@@ -35,10 +35,11 @@ function App() {
       <Routes>
 
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={< Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-
+        {/* <Route path="/home" element={<Home />} /> */}
+        
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
 
 export const ProductContext = createContext();
@@ -13,7 +13,7 @@ export const ProductProvider = ({ children }) => {
       .catch(err => console.log("API Error:", err));
   }, []);
 
-    // Filtered products
+  // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -21,7 +21,9 @@ export const ProductProvider = ({ children }) => {
   }, [products, searchTerm]);
 
   return (
-    <ProductContext.Provider value={{ products, filteredProducts, searchTerm, setSearchTerm}}>
+    <ProductContext.Provider
+      value={{ products, filteredProducts, searchTerm, setSearchTerm }}
+    >
       {children}
     </ProductContext.Provider>
   );

@@ -1,5 +1,5 @@
-const PageName = () => {
-  return <h1>Admin Dashboard</h1>;
+const AdminDashboard = () => {
+  return <div>Admin Dashboard</div>;
 };
 
-export default PageName;
+export default AdminDashboard;

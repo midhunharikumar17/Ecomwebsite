@@ -1,5 +1,5 @@
-const PageName = () => {
+const ManageOrders = () => {
   return <h1>Orders</h1>;
 };
 
-export default PageName;
+export default ManageOrders;

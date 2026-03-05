@@ -1,68 +1,70 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../services/axiosInstance";
+import { loginSuccess } from "../../redux/slices/authSlice";
 const Login = () => {
-  const { login } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        form
-      );
+      const response = await axiosInstance.post("/auth/login", {
+        email,
+        password,
+      });
 
-      login(res.data.user, res.data.token);
-      navigate("/");
-    } catch (err) {
+      if (response.status === 200) {
+        dispatch(
+          loginSuccess({
+            user: response.data.user,
+            token: response.data.token,
+          })
+        );
+
+        navigate("/"); // Navigate AFTER Redux updates
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <h2>Welcome Back</h2>
-        <p className="auth-subtitle">Login to your account</p>
+    <div style={{ padding: "50px" }}>
+      <h2>Login</h2>
 
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email:</label>
+          <br />
           <input
             type="email"
-            name="email"
-            placeholder="Email address"
-            onChange={handleChange}
+            value={email}
             required
+            onChange={(e) => setEmail(e.target.value)}
           />
+        </div>
 
+        <div style={{ marginTop: "10px" }}>
+          <label>Password:</label>
+          <br />
           <input
             type="password"
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
+            value={password}
             required
+            onChange={(e) => setPassword(e.target.value)}
           />
+        </div>
 
-          <button type="submit" className="auth-button">
-            Login
-          </button>
-        </form>
-
-        <p className="auth-footer">
-          Don't have an account? <Link to="/register">Sign up</Link>
-        </p>
-      </div>
+        <button style={{ marginTop: "15px" }} type="submit">
+          Login
+        </button>
+      </form>
     </div>
   );
 };

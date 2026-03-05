@@ -1,5 +1,5 @@
-const PageName = () => {
+const ManageUsers = () => {
   return <h1>Users</h1>;
 };
 
-export default PageName;
+export default ManageUsers;

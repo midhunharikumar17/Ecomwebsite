@@ -1,20 +1,11 @@
-import Navbar from "./components/common/Navbar";
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-
- 
-import { Routes, Route } from "react-router-dom";
-
-// Auth Pages
+// Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-
-// User Pages
 import Home from "./pages/user/Home";
-import Products from "./pages/user/Products";
 import ProductDetails from "./pages/user/ProductDetails";
 import Cart from "./pages/user/Cart";
 import Wishlist from "./pages/user/Wishlist";
@@ -22,42 +13,122 @@ import Orders from "./pages/user/Orders";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-import AdminProducts from "./pages/admin/Products";
-import AdminOrders from "./pages/admin/Orders";
-import AdminUsers from "./pages/admin/Users";
+import Products from "./pages/admin/Products";
+import ManageOrders from "./pages/admin/Orders";
+import ManageUsers from "./pages/admin/Users";
 
+const App = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
-function App() {
+  // Protected Route Wrapper
+  const ProtectedRoute = ({ children }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
+
+  // Admin Route Wrapper
+  const AdminRoute = ({ children }) => {
+    if (!isAuthenticated || user?.role !== "admin") {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+
   return (
-    <>
-      <Navbar />
-      
-      <Routes>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        {/* Public Routes */}
-        <Route path="/" element={< Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        {/* <Route path="/home" element={<Home />} /> */}
-        
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      {/* User Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* User Routes */}
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/orders" element={<Orders />} />
+      <Route
+        path="/product/:id"
+        element={
+          <ProtectedRoute>
+            <ProductDetails />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        }
+      />
 
-      </Routes>
-    </>
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <Wishlist />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/products"
+        element={
+          <AdminRoute>
+            <Products />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/orders"
+        element={
+          <AdminRoute>
+            <ManageOrders />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <ManageUsers />
+          </AdminRoute>
+        }
+      />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
-}
+};
 
 export default App;

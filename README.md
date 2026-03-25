@@ -11,7 +11,7 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 ![Home](Home.png)
 >#### Products
 ![Products](Products.png)
->####Footer
+>#### Footer
 ![Footer](Footer.png)
 >####  Wishlist
 ![Wishlist](Wishlist.png)

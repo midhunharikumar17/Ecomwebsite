@@ -4,11 +4,6 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 
 ---
 
-## 🚀 Live Demo
-
-> Coming soon / Add your deployed URL here
-
----
 
 ## 📸 Screenshots
 

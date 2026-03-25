@@ -7,18 +7,28 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 
 ## 📸 Screenshots
 
->HomePage
+>#### HomePage
 ![Home](Home.png)
->![Products](Products.png)
->![Footer](Footer.png)
->![Wishlist](Wishlist.png)
->![Cart](Cart.png)
->![Checkot](Checkout.png)
->![Creview](<Checkout Review.png>)
->![Payment](Payment.png)
->![Orders](Orders.png)
->![Chatbot](Chatbot.png)
->![Admin Dashboard](AdminDashboard.png)
+>#### Products
+![Products](Products.png)
+>####Footer
+![Footer](Footer.png)
+>####  Wishlist
+![Wishlist](Wishlist.png)
+>#### Cart
+![Cart](Cart.png)
+>#### Checkout
+![Checkot](Checkout.png)
+>#### Checkout Review
+![Creview](<Checkout Review.png>)
+>#### Payment
+![Payment](Payment.png)
+>#### Orders
+![Orders](Orders.png)
+>#### Chatbot
+![Chatbot](Chatbot.png)
+>#### Admin Dashboard
+![Admin Dashboard](AdminDashboard.png)
 
 ## ✨ Features
 

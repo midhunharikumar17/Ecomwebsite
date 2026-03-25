@@ -28,8 +28,8 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 >#### Chatbot
 ![Chatbot](Chatbot.png)
 >#### Admin Dashboard
-![Admin Dashboard](AdminDashboard.png)
-
+![Admin Dashboard](READMEpreview\AdminDashboard.png)
+  
 ## ✨ Features
 
 ### User

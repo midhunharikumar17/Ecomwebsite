@@ -7,29 +7,39 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 
 ## 📸 Screenshots
 
->#### HomePage
+#### 🏠 Home Page
 ![Home](ecom-site/screenshot/Home.png)
->#### Products
-![Products](ecom-site/screenshot\Products.png)
->#### Footer
-![Footer](ecom-site/screenshot\Footer.png)
->####  Wishlist
-![Wishlist](ecom-site/screenshot\Wishlist.png)
->#### Cart
-![Cart](ecom-site/screenshot\Cart.png)
->#### Checkout
-![Checkot](ecom-site/screenshot\Checkout.png)
->#### Checkout Review
-![Creview](ecom-site/screenshot/CheckoutReview.png)
->#### Payment
-![Payment](ecom-site/screenshot\Payment.png)
->#### Orders
-![Orders](ecom-site/screenshot\Orders.png)
->#### Chatbot
-![Chatbot](ecom-site/screenshot\Chatbot.png)
->#### Admin Dashboard
-![Admin Dashboard](ecom-site/screenshot\AdminDashboard.png)
-  
+
+#### 🛍️ Products
+![Products](ecom-site/screenshot/Products.png)
+
+#### 🦶 Footer
+![Footer](ecom-site/screenshot/Footer.png)
+
+#### 🤍 Wishlist
+![Wishlist](ecom-site/screenshot/Wishlist.png)
+
+#### 🛒 Cart
+![Cart](ecom-site/screenshot/Cart.png)
+
+#### 💳 Checkout
+![Checkout](ecom-site/screenshot/Checkout.png)
+
+#### 📋 Checkout Review
+![Checkout Review](ecom-site/screenshot/CheckoutReview.png)
+
+#### 💰 Payment
+![Payment](ecom-site/screenshot/Payment.png)
+
+#### 📦 Orders
+![Orders](ecom-site/screenshot/Orders.png)
+
+#### 🤖 Chatbot
+![Chatbot](ecom-site/screenshot/Chatbot.png)
+
+#### 🖥️ Admin Dashboard
+![Admin Dashboard](ecom-site/screenshot/AdminDashboard.png)
+
 ## ✨ Features
 
 ### User

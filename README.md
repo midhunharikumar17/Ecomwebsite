@@ -1,4 +1,4 @@
-# 🛍️ YourStore — Full-Stack E-Commerce Platform
+# 🛍️ ShopApp — Full-Stack E-Commerce Platform
 
 A production-grade e-commerce web application built with React, Redux Toolkit, Node.js, Express, and MongoDB. Features real-time order updates, AI-powered chatbot, Razorpay payment integration, and a full admin dashboard.
 
@@ -12,8 +12,13 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 
 ## 📸 Screenshots
 
-> Add screenshots of Home, Product Details, Cart, and Admin Dashboard here
-
+>![HOME](image.png)
+>![PRODUCTS](<Screenshot 2026-03-25 154753.png>)
+>![WISHLIST](<Screenshot 2026-03-25 154807.png>)
+>![CART](<Screenshot 2026-03-25 154819.png>)
+>![YOUR ORDERS](<Screenshot 2026-03-25 154832.png>)
+>![FOOTER](<Screenshot 2026-03-25 154854.png>)
+>![CHATBOT](<Screenshot 2026-03-25 154854-1.png>)
 ---
 
 ## ✨ Features

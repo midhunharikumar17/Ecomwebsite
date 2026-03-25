@@ -8,7 +8,7 @@ A production-grade e-commerce web application built with React, Redux Toolkit, N
 ## 📸 Screenshots
 
 >#### HomePage
-![Home](screenshot\Home.png)
+![Home]ecom-site/screenshot/Home.png
 >#### Products
 ![Products](screenshot\Products.png)
 >#### Footer

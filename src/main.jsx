@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react"; // ✅ Add persistence
 import { store, persistor } from "./redux/store"; // ✅ Export persistor from store
+import { SocketProvider } from "./context/SocketContext";
 import "./index.css"; // ✅ Single CSS entry point
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -13,9 +14,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       {/* ✅ FIX 6: PersistGate prevents flash-of-unauthenticated on refresh */}
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+      <SocketProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
+        </SocketProvider>
       </PersistGate>
     </Provider>
   </React.StrictMode>

@@ -2,20 +2,28 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../../services/axiosInstance";
 import Navbar from "../../components/common/Navbar";
+import "./Orders.css";
 
-// ✅ FIX 1: Correct component name
+const statusConfig = {
+  "Pending":         { color: "yellow", icon: "🕐" },
+  "Payment Success": { color: "blue",   icon: "💳" },
+  "Shipped":         { color: "purple", icon: "🚚" },
+  "Delivered":       { color: "green",  icon: "✅" },
+  "Cancelled":       { color: "red",    icon: "❌" },
+};
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [expanded, setExpanded] = useState(null);
 
-  // ✅ FIX 2: Actually fetch orders from backend
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const { data } = await axiosInstance.get("/orders");
         setOrders(data);
-      } catch (err) {
+      } catch {
         setError("Failed to load orders");
       } finally {
         setLoading(false);
@@ -24,94 +32,155 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  // Status badge color
-  const statusColor = (status) => {
-    switch (status) {
-      case "Pending":         return "bg-yellow-100 text-yellow-700";
-      case "Payment Success": return "bg-blue-100 text-blue-700";
-      case "Shipped":         return "bg-purple-100 text-purple-700";
-      case "Delivered":       return "bg-green-100 text-green-700";
-      default:                return "bg-gray-100 text-gray-700";
-    }
-  };
+  const toggle = (id) => setExpanded(expanded === id ? null : id);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="or-page">
       <Navbar />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
+      <div className="or-wrapper">
+        {/* Header */}
+        <div className="or-header">
+          <h1 className="or-title">Your Orders</h1>
+          {orders.length > 0 && (
+            <span className="or-count">{orders.length} order{orders.length !== 1 ? "s" : ""}</span>
+          )}
+        </div>
 
+        {/* Loading skeletons */}
         {loading && (
-          <p className="text-center text-gray-500">Loading orders...</p>
+          <div className="or-skeletons">
+            {[1,2,3].map(i => (
+              <div key={i} className="or-skeleton">
+                <div className="or-skeleton__top" />
+                <div className="or-skeleton__line" />
+                <div className="or-skeleton__line or-skeleton__line--short" />
+              </div>
+            ))}
+          </div>
         )}
 
+        {/* Error */}
         {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg">
+          <div className="or-error">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             {error}
           </div>
         )}
 
-        {!loading && orders.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg mb-4">No orders yet</p>
-            <Link
-              to="/"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Start Shopping
-            </Link>
+        {/* Empty */}
+        {!loading && !error && orders.length === 0 && (
+          <div className="or-empty">
+            <div className="or-empty__icon">📦</div>
+            <h2 className="or-empty__title">No orders yet</h2>
+            <p className="or-empty__sub">Your order history will appear here once you make a purchase.</p>
+            <Link to="/" className="or-empty__btn">Start Shopping</Link>
           </div>
         )}
 
-        <div className="space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order._id}
-              className="bg-white rounded-xl shadow p-6"
-            >
-              {/* Order header */}
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">Order ID</p>
-                  <p className="font-mono text-sm font-semibold">{order._id}</p>
-                </div>
-                <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColor(order.status)}`}>
-                  {order.status}
-                </span>
-              </div>
+        {/* Orders list */}
+        {!loading && orders.length > 0 && (
+          <div className="or-list">
+            {orders.map((order) => {
+              const status = statusConfig[order.status] || { color: "gray", icon: "📋" };
+              const isOpen = expanded === order._id;
 
-              {/* Order items */}
-              <div className="space-y-2 mb-4">
-                {order.items?.map((item) => (
-                  <div key={item._id} className="flex justify-between text-sm text-gray-700">
-                    <span>{item.name} × {item.quantity}</span>
-                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+              return (
+                <div key={order._id} className={`or-card ${isOpen ? "or-card--open" : ""}`}>
+                  {/* Card header */}
+                  <div className="or-card__head" onClick={() => toggle(order._id)}>
+                    <div className="or-card__head-left">
+                      <div className="or-card__id-wrap">
+                        <span className="or-card__id-label">Order</span>
+                        <span className="or-card__id">#{order._id?.slice(-8).toUpperCase()}</span>
+                      </div>
+                      <div className="or-card__meta">
+                        <span className="or-card__date">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                          </svg>
+                          {new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                        <span className="or-card__items-count">{order.items?.length || 0} item{order.items?.length !== 1 ? "s" : ""}</span>
+                      </div>
+                    </div>
+
+                    <div className="or-card__head-right">
+                      <span className={`or-badge or-badge--${status.color}`}>
+                        {status.icon} {order.status}
+                      </span>
+                      <span className="or-card__total">₹{order.totalAmount?.toLocaleString()}</span>
+                      <svg className={`or-card__chevron ${isOpen ? "or-card__chevron--open" : ""}`}
+                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Order footer */}
-              <div className="flex justify-between items-center border-t pt-4">
-                <p className="text-sm text-gray-500">
-                  Placed on {new Date(order.createdAt).toLocaleDateString()}
-                </p>
-                <p className="font-bold text-blue-600">
-                  Total: ₹{order.totalAmount?.toFixed(2)}
-                </p>
-              </div>
+                  {/* Expandable body */}
+                  {isOpen && (
+                    <div className="or-card__body">
+                      <div className="or-card__divider" />
 
-              {/* Shipping info */}
-              {order.shippingAddress && (
-                <div className="mt-3 text-sm text-gray-500 border-t pt-3">
-                  📦 Shipping to: {order.shippingAddress.address},{" "}
-                  {order.shippingAddress.city}, {order.shippingAddress.state} —{" "}
-                  {order.shippingAddress.pincode}
+                      {/* Items */}
+                      <div className="or-card__items">
+                        <p className="or-card__section-label">Items Ordered</p>
+                        {order.items?.map((item, i) => (
+                          <div key={i} className="or-item">
+                            <div className="or-item__img-wrap">
+                              {item.image ? (
+                                <img src={item.image} alt={item.name} className="or-item__img" />
+                              ) : (
+                                <div className="or-item__img-fallback">🛍️</div>
+                              )}
+                            </div>
+                            <div className="or-item__info">
+                              <span className="or-item__name">{item.name}</span>
+                              <span className="or-item__qty">Qty: {item.quantity}</span>
+                            </div>
+                            <span className="or-item__price">
+                              ₹{(item.price * item.quantity).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Shipping */}
+                      {order.shippingAddress && (
+                        <div className="or-card__shipping">
+                          <p className="or-card__section-label">Shipping Address</p>
+                          <div className="or-shipping">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span>
+                              {order.shippingAddress.address}, {order.shippingAddress.city},{" "}
+                              {order.shippingAddress.state} — {order.shippingAddress.pincode}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Summary */}
+                      <div className="or-card__summary">
+                        <div className="or-card__summary-row">
+                          <span>Payment</span>
+                          <span className="or-card__payment">{order.payment?.method || "Razorpay"}</span>
+                        </div>
+                        <div className="or-card__summary-row or-card__summary-row--total">
+                          <span>Order Total</span>
+                          <span className="or-card__summary-total">₹{order.totalAmount?.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

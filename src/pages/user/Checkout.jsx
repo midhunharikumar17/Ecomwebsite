@@ -287,7 +287,7 @@ const Checkout = () => {
                           <p className="font-medium text-gray-800 text-sm">{item.name}</p>
                           <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                         </div>
-                        <p className="font-semibold text-blue-600">
+                        <p className="text-red-700 text-xl font-extrabold tracking-tight">
                           ₹{(discounted * item.quantity).toFixed(2)}
                         </p>
                       </div>

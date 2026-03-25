@@ -2,6 +2,10 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+//chatbot
+import Chatbot from "./components/common/Chatbot";
+//footer
+import Footer from "./components/common/Footer";
 // Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -14,9 +18,9 @@ import Checkout from "./pages/user/Checkout"; // Add this page
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-import Products from "./pages/admin/Products";
-import ManageOrders from "./pages/admin/Orders";
-import ManageUsers from "./pages/admin/Users";
+import Products from "./pages/admin/AdminProducts";
+import ManageOrders from "./pages/admin/AdminOrders";
+import ManageUsers from "./pages/admin/AdminUsers";
 
 import NotFound from "./pages/NotFound"; // Add this page
 
@@ -39,6 +43,7 @@ const App = () => {
   const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
 
   return (
+    <div>
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
@@ -109,7 +114,12 @@ const App = () => {
 
       {/* ✅ FIX 2 & 6: Proper fallback with real 404 page */}
       <Route path="*" element={<NotFound />} />
+
+     
     </Routes>
+    <Footer />
+    {isAuthenticated && <Chatbot />}
+    </div>
   );
 };
 

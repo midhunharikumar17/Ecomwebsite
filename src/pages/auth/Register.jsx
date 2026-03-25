@@ -1,84 +1,121 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { registerUser } from "../../redux/slices/authSlice";
 import "./Auth.css";
 
 const Register = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
+  const { loading, error } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
-
-  const [error, setError] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setValidationError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    try {
-      await register(formData);
-      navigate("/"); // redirect after successful registration
-    } catch (err) {
-  console.log(err.response?.data);
-  setError(err.response?.data?.message || "Registration failed");
-}
+    if (!formData.name || !formData.email || !formData.password) {
+      setValidationError("All fields are required.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setValidationError("Passwords do not match.");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setValidationError("Password must be at least 6 characters.");
+      return;
+    }
+
+    const result = await dispatch(
+      registerUser({ name: formData.name, email: formData.email, password: formData.password })
+    );
+
+    if (registerUser.fulfilled.match(result)) {
+      navigate("/");
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Create Account</h2>
+        <div className="auth-logo">⚡ Shop<em>App</em></div>
+        <h2 className="auth-title">Create account</h2>
+        <p className="auth-subtitle">Join us and start shopping today</p>
 
-        {error && <p className="auth-error">{error}</p>}
+        {(validationError || error) && (
+          <div className="auth-error">{validationError || error}</div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-field">
+            <label>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Your full name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="auth-field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            autoComplete="new-password"
-            required
-          />
+          <div className="auth-field">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Min. 6 characters"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <button type="submit" className="auth-btn">
-            Register
+          <div className="auth-field">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Repeat your password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
-        <p className="auth-footer">
-          Already have an account?{" "}
-          <Link to="/login">Login</Link>
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>

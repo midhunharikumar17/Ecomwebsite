@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ onSearchVisible }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,18 +14,44 @@ const Navbar = () => {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setScrolled(scrollY > 20);
+      // Show navbar search when hero search has scrolled past navbar height (~70px)
+      setSearchVisible(scrollY > 180);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
+    setDropdownOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Focus search input when it appears
+  useEffect(() => {
+    if (searchVisible && searchRef.current) {
+      // Don't auto-focus — just make it available
+    }
+  }, [searchVisible]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -56,14 +82,18 @@ const Navbar = () => {
             <span className="navbar__logo-text">Shop<em>App</em></span>
           </Link>
 
-          {/* Search */}
-          <form className="navbar__search" onSubmit={handleSearch}>
+          {/* Search — appears when hero search scrolls past */}
+          <form
+            className={`navbar__search ${searchVisible ? "navbar__search--visible" : ""}`}
+            onSubmit={handleSearch}
+          >
             <span className="navbar__search-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </span>
             <input
+              ref={searchRef}
               type="text"
               placeholder="Search products..."
               value={searchQuery}
@@ -83,11 +113,8 @@ const Navbar = () => {
                 {label}
               </Link>
             ))}
-
             {user?.role === "admin" && (
-              <Link to="/admin" className="navbar__link navbar__link--admin">
-                Admin
-              </Link>
+              <Link to="/admin" className="navbar__link navbar__link--admin">Admin</Link>
             )}
           </div>
 
@@ -108,23 +135,25 @@ const Navbar = () => {
               {cartCount > 0 && <span className="navbar__badge">{cartCount}</span>}
             </Link>
 
-            <div className="navbar__user">
-              <div className="navbar__avatar">
+            <div className="navbar__user" ref={dropdownRef}>
+              <div className="navbar__avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </div>
-              <div className="navbar__user-dropdown">
-                <div className="navbar__user-info">
-                  <span className="navbar__user-name">{user?.name}</span>
-                  <span className="navbar__user-email">{user?.email}</span>
+              {dropdownOpen && (
+                <div className="navbar__user-dropdown navbar__user-dropdown--open">
+                  <div className="navbar__user-info">
+                    <span className="navbar__user-name">{user?.name}</span>
+                    <span className="navbar__user-email">{user?.email}</span>
+                  </div>
+                  <div className="navbar__dropdown-divider" />
+                  <button onClick={handleLogout} className="navbar__logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Sign out
+                  </button>
                 </div>
-                <div className="navbar__dropdown-divider" />
-                <button onClick={handleLogout} className="navbar__logout-btn">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-                  </svg>
-                  Sign out
-                </button>
-              </div>
+              )}
             </div>
           </div>
 
@@ -149,17 +178,12 @@ const Navbar = () => {
             />
             <button type="submit">Search</button>
           </form>
-
           <div className="navbar__mobile-links">
             {navLinks.map(({ to, label }) => (
               <Link key={to} to={to} className="navbar__mobile-link">{label}</Link>
             ))}
-            <Link to="/cart" className="navbar__mobile-link">
-              Cart {cartCount > 0 && `(${cartCount})`}
-            </Link>
-            <Link to="/wishlist" className="navbar__mobile-link">
-              Wishlist {wishlistCount > 0 && `(${wishlistCount})`}
-            </Link>
+            <Link to="/cart" className="navbar__mobile-link">Cart {cartCount > 0 && `(${cartCount})`}</Link>
+            <Link to="/wishlist" className="navbar__mobile-link">Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</Link>
             {user?.role === "admin" && (
               <Link to="/admin" className="navbar__mobile-link navbar__mobile-link--admin">Admin Panel</Link>
             )}
@@ -167,10 +191,11 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      {/* Spacer so content doesn't go under fixed navbar */}
       <div className="navbar__spacer" />
     </>
   );
 };
 
 export default Navbar;
+
+/* ---- ADD THESE TO YOUR Navbar.css ---- */

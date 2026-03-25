@@ -1,82 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
-import Navbar from "../../components/common/Navbar";
+import { useLocation } from "react-router-dom";
+import ProductCard from "../../components/product/ProductCard";
 import axiosInstance from "../../services/axiosInstance";
 import { setProducts as setReduxProducts, setLoading as setReduxLoading, setError as setReduxError } from "../../redux/slices/productSlice";
-import { addToCart } from "../../redux/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../redux/slices/wishlistSlice";
 import "./Home.css";
+import Navbar from "../../components/common/Navbar";
 
 const CATEGORIES = ["All", "Electronics", "Clothing", "Books", "Home", "Beauty", "Sports"];
-
-const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted }) => {
-  const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
-
-  return (
-    <div className="product-card">
-      <div className="product-card__image-wrap">
-        <img
-          src={product.images?.[0] || "/placeholder.png"}
-          alt={product.name}
-          className="product-card__image"
-          loading="lazy"
-        />
-        {product.discount > 0 && (
-          <span className="product-card__discount-badge">-{product.discount}%</span>
-        )}
-        {product.stock === 0 && (
-          <div className="product-card__out-of-stock">Out of Stock</div>
-        )}
-        <button
-          className={`product-card__wishlist ${isWishlisted ? "product-card__wishlist--active" : ""}`}
-          onClick={(e) => { e.preventDefault(); onToggleWishlist(product); }}
-          aria-label="Toggle wishlist"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-      </div>
-
-      <div className="product-card__body">
-        <p className="product-card__category">{product.category?.name || "General"}</p>
-        <Link to={`/product/${product._id}`} className="product-card__name">
-          {product.name}
-        </Link>
-
-        <div className="product-card__pricing">
-          <span className="product-card__price">₹{discountedPrice.toFixed(0)}</span>
-          {product.discount > 0 && (
-            <span className="product-card__original">₹{product.price}</span>
-          )}
-        </div>
-
-        <div className="product-card__stock-bar">
-          <div
-            className="product-card__stock-fill"
-            style={{ width: `${Math.min((product.stock / 50) * 100, 100)}%` }}
-          />
-        </div>
-        <p className="product-card__stock-text">
-          {product.stock === 0 ? "Out of stock" : product.stock < 5 ? `Only ${product.stock} left` : "In stock"}
-        </p>
-
-        <button
-          className="product-card__cart-btn"
-          onClick={() => onAddToCart(product)}
-          disabled={product.stock === 0}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
-          {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -92,7 +23,22 @@ const Home = () => {
   const [sortBy, setSortBy] = useState("default");
   const [addedId, setAddedId] = useState(null);
 
-  // Read search from URL params
+  const heroSearchRef = useRef(null);
+
+useEffect(() => {
+  const handleScroll = () => {
+    if (heroSearchRef.current) {
+      const scrollY = window.scrollY;
+      const opacity = Math.max(0, 1 - (scrollY - 80) / 120);
+      const translateY = Math.min(scrollY * 0.3, 40);
+      heroSearchRef.current.style.opacity = opacity;
+      heroSearchRef.current.style.transform = `translateY(-${translateY}px)`;
+    }
+  };
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const q = params.get("search");
@@ -118,21 +64,6 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (product) => {
-    dispatch(addToCart(product));
-    setAddedId(product._id);
-    setTimeout(() => setAddedId(null), 1500);
-  };
-
-  const handleToggleWishlist = (product) => {
-    const isWishlisted = wishlistItems.some((i) => i._id === product._id);
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(product._id));
-    } else {
-      dispatch(addToWishlist(product));
-    }
-  };
-
   // Filter + sort
   let filtered = products.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -147,34 +78,125 @@ const Home = () => {
   return (
     <div className="home">
       <Navbar />
-
       {/* Hero */}
-      <section className="home__hero">
-        <div className="home__hero-content">
-          <p className="home__hero-eyebrow">Welcome back, {user?.name?.split(" ")[0] || "there"} 👋</p>
-          <h1 className="home__hero-title">
-            Discover <em>Amazing</em><br />Products Today
-          </h1>
-          <p className="home__hero-sub">Shop the latest trends with unbeatable prices and fast delivery.</p>
-          <div className="home__hero-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="What are you looking for?"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+{/* ── REPLACE your entire <section className="home__hero"> with this ── */}
+
+<section className="home__hero">
+  {/* Background layers */}
+  <div className="home__hero-bg">
+    <div className="home__hero-grid" />
+    <div className="home__hero-glow home__hero-glow--1" />
+    <div className="home__hero-glow home__hero-glow--2" />
+    <div className="home__hero-glow home__hero-glow--3" />
+  </div>
+
+  <div className="home__hero-inner">
+    {/* Left content */}
+    <div className="home__hero-content">
+
+      {/* Pill badge */}
+      <div className="home__hero-badge">
+        <span className="home__hero-badge-dot" />
+        New arrivals just dropped
+      </div>
+
+      <h1 className="home__hero-title">
+        Shop the<br />
+        <span className="home__hero-title-accent">Future</span>
+        <span className="home__hero-title-plain">, Today.</span>
+      </h1>
+
+      <p className="home__hero-sub">
+        Curated products, unbeatable prices,<br className="home__hero-sub-br" />
+        delivered fast — right to your door.
+      </p>
+
+      {/* Search bar */}
+      <div className="home__hero-search" ref={heroSearchRef}>
+        <div className="home__hero-search-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="home__hero-search-icon">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search for products, brands, categories..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="home__hero-search-input"
+          />
+          <button className="home__hero-search-btn" type="button">
+            Search
+          </button>
         </div>
-        <div className="home__hero-visual">
-          <div className="home__hero-blob" />
-          <div className="home__hero-float home__hero-float--1">🛍️</div>
-          <div className="home__hero-float home__hero-float--2">⚡</div>
-          <div className="home__hero-float home__hero-float--3">🎁</div>
+        <div className="home__hero-search-tags">
+          {["Electronics", "Clothing", "Books", "Home"].map((tag) => (
+            <button
+              key={tag}
+              className="home__hero-tag"
+              onClick={() => setActiveCategory(tag)}
+            >
+              {tag}
+            </button>
+          ))}
         </div>
-      </section>
+      </div>
+
+      {/* Trust row */}
+      <div className="home__hero-trust">
+        <div className="home__hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Free delivery ₹500+
+        </div>
+        <div className="home__hero-trust-dot" />
+        <div className="home__hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          7-day returns
+        </div>
+        <div className="home__hero-trust-dot" />
+        <div className="home__hero-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Secure checkout
+        </div>
+      </div>
+    </div>
+
+    {/* Right visual */}
+    <div className="home__hero-visual">
+      <div className="home__hero-card home__hero-card--main">
+        <div className="home__hero-card-img">🎧</div>
+        <div className="home__hero-card-info">
+          <span className="home__hero-card-name">Premium Headphones</span>
+          <span className="home__hero-card-price">₹2,499</span>
+        </div>
+        <div className="home__hero-card-badge">-30%</div>
+      </div>
+      <div className="home__hero-card home__hero-card--sm1">
+        <div className="home__hero-card-img">📱</div>
+        <div className="home__hero-card-info">
+          <span className="home__hero-card-name">Smartphones</span>
+          <span className="home__hero-card-price">₹12,999</span>
+        </div>
+      </div>
+      <div className="home__hero-card home__hero-card--sm2">
+        <div className="home__hero-card-img">👟</div>
+        <div className="home__hero-card-info">
+          <span className="home__hero-card-name">Sneakers</span>
+          <span className="home__hero-card-price">₹1,799</span>
+        </div>
+      </div>
+      <div className="home__hero-stats">
+        <div className="home__hero-stat">
+          <strong>50k+</strong>
+          <span>Happy Customers</span>
+        </div>
+        <div className="home__hero-stat">
+          <strong>4.9★</strong>
+          <span>Avg Rating</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Stats Bar */}
       <div className="home__stats">
@@ -215,7 +237,6 @@ const Home = () => {
               </button>
             ))}
           </div>
-
           <div className="home__sort">
             <select
               value={sortBy}
@@ -269,13 +290,7 @@ const Home = () => {
         ) : (
           <div className="home__grid">
             {filtered.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onAddToCart={handleAddToCart}
-                onToggleWishlist={handleToggleWishlist}
-                isWishlisted={wishlistItems.some((i) => i._id === product._id)}
-              />
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         )}
